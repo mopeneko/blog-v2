@@ -16,7 +16,11 @@
     {{ range .articles }}
     <div class="card bg-base-100 shadow-sm mt-4">
       <figure class="aspect-video">
-        <div class="skeleton h-full w-full"></div>
+        {{ if .Thumbnail }}
+          <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
+        {{ else }}
+          <div class="skeleton h-full w-full"></div>
+        {{ end }}
       </figure>
 
       <div class="card-body">

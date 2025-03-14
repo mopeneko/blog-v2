@@ -12,11 +12,11 @@ import (
 type Article struct {
 	newt.BaseContent
 
-	Title     string     `json:"title"`
-	Slug      string     `json:"slug"`
-	Thumbnail newt.Image `json:"thumbnail"`
-	Content   string     `json:"content"`
-	Tags      []Tag      `json:"tags"`
+	Title     string      `json:"title"`
+	Slug      string      `json:"slug"`
+	Thumbnail *newt.Image `json:"thumbnail"`
+	Content   string      `json:"content"`
+	Tags      []Tag       `json:"tags"`
 }
 
 func FetchArticles() ([]*Article, error) {
