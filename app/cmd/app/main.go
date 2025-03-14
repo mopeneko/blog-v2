@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/template/html/v2"
 	"github.com/mopeneko/blog-v2/app/model"
-	"github.com/mopeneko/blog-v2/app/newt"
 	"github.com/mopeneko/blog-v2/app/view"
 	"github.com/mopeneko/blog-v2/app/view/tmpl"
 )
@@ -29,33 +27,13 @@ func main() {
 	})
 
 	app.Get("/", func(c fiber.Ctx) error {
-		req, err := http.NewRequest("GET", os.Getenv("NEWT_API"), nil)
+		articles, err := model.FetchArticles()
 		if err != nil {
-			log.Errorw("Failed to create request", "err", err)
+			log.Errorw("Failed to fetch articles", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
-		req.Header.Set("Authorization", "Bearer "+os.Getenv("NEWT_TOKEN"))
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Errorw("Failed to send request", "err", err)
-			return c.SendStatus(http.StatusInternalServerError)
-		}
-
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			log.Errorw("Failed to get articles", "status", resp.StatusCode)
-			return c.SendStatus(http.StatusInternalServerError)
-		}
-
-		contents := new(newt.Contents[*model.Article])
-		if err := json.NewDecoder(resp.Body).Decode(contents); err != nil {
-			log.Errorw("Failed to decode response", "err", err)
-			return c.SendStatus(http.StatusInternalServerError)
-		}
-		return view.NewArticlesIndex(contents.Items).Render(c)
+		return view.NewArticlesIndex(articles).Render(c)
 	})
 
 	host := "localhost"
