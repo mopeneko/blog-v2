@@ -13,30 +13,32 @@
   </nav>
 
   <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
+    {{ range .articles }}
     <div class="card bg-base-100 shadow-sm mt-4">
       <figure class="aspect-video">
         <div class="skeleton h-full w-full"></div>
       </figure>
 
       <div class="card-body">
-        <div class="card-title">ああああああ</div>
+        <div class="card-title">{{ .Title }}</div>
 
         <div class="card-actions justify-end">
           <div class="grid grid-row-1 gap-y-2">
             <div class="text-xs text-right">
-              <div>Published on 2025-01-01</div>
-              <div>Updated on 2025-01-01</div>
+              <div>Published on {{ date .PublishedAt }}</div>
+              <div>Updated on {{ date .UpdatedAt }}</div>
             </div>
 
             <div class="text-right">
-              <div class="badge badge-soft badge-primary">aaaa</div>
-              <div class="badge badge-soft badge-primary">bbbb</div>
-              <div class="badge badge-soft badge-primary">cccc</div>
+              {{ range .Tags }}
+              <div class="badge badge-soft badge-primary">{{ . }}</div>
+              {{ end }}
             </div>
           </div>
         </div>
       </div>
     </div>
+    {{ end }}
   </div>
 </body>
 </html>
