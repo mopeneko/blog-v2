@@ -2,12 +2,17 @@ module github.com/mopeneko/blog-v2
 
 go 1.24.1
 
-require github.com/gofiber/fiber/v3 v3.0.0-beta.4
+require (
+	github.com/gofiber/fiber/v3 v3.0.0-beta.4
+	github.com/gofiber/template/html/v2 v2.1.3
+)
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/gofiber/schema v1.3.0 // indirect
+	github.com/gofiber/template v1.8.3 // indirect
+	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/gofiber/utils/v2 v2.0.0-beta.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
