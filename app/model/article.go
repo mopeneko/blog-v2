@@ -1,10 +1,16 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/mopeneko/blog-v2/app/newt"
+)
 
 type Article struct {
-	Title       string
-	PublishedAt time.Time
-	UpdatedAt   time.Time
-	Tags        []string
+	newt.BaseContent
+
+	Title       string    `json:"title"`
+	PublishedAt time.Time `json:"publishedAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Tags        []Tag     `json:"tags"`
 }
