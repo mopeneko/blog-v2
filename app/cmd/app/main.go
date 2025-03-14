@@ -50,22 +50,12 @@ func main() {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
-		contents := new(newt.Contents[model.Article])
+		contents := new(newt.Contents[*model.Article])
 		if err := json.NewDecoder(resp.Body).Decode(contents); err != nil {
 			log.Errorw("Failed to decode response", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
 		}
-
-		articles := []*model.Article{}
-		for _, item := range contents.Items {
-			articles = append(articles, &model.Article{
-				Title:       item.Title,
-				PublishedAt: item.Sys.PublishedAt,
-				UpdatedAt:   item.Sys.UpdatedAt,
-				Tags:        item.Tags,
-			})
-		}
-		return view.NewArticlesIndex(articles).Render(c)
+		return view.NewArticlesIndex(contents.Items).Render(c)
 	})
 
 	host := "localhost"
