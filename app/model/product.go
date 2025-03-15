@@ -8,4 +8,5 @@ type Product struct {
 	Name        string                    `json:"name"`
 	Manufacture string                    `json:"manufacture"`
 	Links       []newt.CustomField[*Link] `json:"links"`
+	Image       *newt.Image               `json:"image"`
 }

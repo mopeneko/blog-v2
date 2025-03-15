@@ -35,6 +35,7 @@ func FetchArticles() ([]*Article, error) {
 
 	q := url.Values{}
 	q.Set("order", "-published_at")
+	q.Set("select", "title,slug,thumbnail,tags,published_at,updated_at")
 
 	req, err := http.NewRequest("GET", base_url+path+"?"+q.Encode(), nil)
 	if err != nil {
