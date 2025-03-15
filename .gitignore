@@ -27,5 +27,5 @@ go.work.sum
 # air
 tmp/
 
-dist/
+./app/view/dist/style.css
 node_modules/
