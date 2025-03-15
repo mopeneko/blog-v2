@@ -21,6 +21,7 @@ type Article struct {
 	Tags        []Tag       `json:"tags"`
 	PublishedAt time.Time   `json:"published_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
+	Product     *Product    `json:"product"`
 }
 
 func FetchArticles() ([]*Article, error) {

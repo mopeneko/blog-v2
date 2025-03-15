@@ -36,3 +36,9 @@ type Image struct {
 	Title       string `json:"title"`
 	Width       int    `json:"width"`
 }
+
+type CustomField[T any] struct {
+	ID   string `json:"_id"`
+	Type string `json:"type"`
+	Data T      `json:"data"`
+}
