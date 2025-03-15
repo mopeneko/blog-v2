@@ -4,8 +4,8 @@
   </a>
 </nav>
 
-<article class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
-  <h2 class="text-2xl font-bold mt-8">{{ .article.Title }}</h2>
+<article class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto my-8">
+  <h2 class="text-2xl font-bold">{{ .article.Title }}</h2>
 
   <div class="grid grid-row-1 gap-y-2 mt-2">
     <div class="text-xs text-right">
@@ -20,15 +20,34 @@
     </div>
   </div>
 
-  <figure class="aspect-video mt-4">
   {{ if .article.Thumbnail }}
-    <img src="{{ .article.Thumbnail.Src }}" alt="{{ .article.Thumbnail.AltText }}">
-  {{ else }}
-    <div class="skeleton h-full w-full"></div>
-  {{ end }}
+  <figure class="mt-4">
+    <img class="w-full rounded-lg" src="{{ .article.Thumbnail.Src }}" alt="{{ .article.Thumbnail.AltText }}">
   </figure>
+  {{ end }}
 
-  <div class="prose prose-slate mt-8 w-full m-auto">
+  <div class="prose mt-8 w-full m-auto">
     {{ unescape .article.Content }}
   </div>
+
+  {{ if .article.Product }}
+  <div class="prose mt-8 w-full m-auto">
+    <div class="not-prose card bg-base-100 shadow-sm">
+      {{ if .article.Product.Image }}
+      <figure class="aspect-video">
+        <img class="h-full" src="{{ .article.Product.Image.Src }}" alt="{{ .article.Product.Image.AltText }}">
+      </figure>
+      {{ end }}
+      <div class="card-body">
+        <h3 class="card-title">{{ .article.Product.Name }}</h3>
+        <p class="card-text">{{ .article.Product.Manufacture }}</p>
+      </div>
+      <footer class="card-actions justify-end">
+        {{ range .article.Product.Links }}
+        <a href="{{ .Data.URL }}" class="btn btn-primary">{{ .Data.Text }}</a>
+        {{ end }}
+      </footer>
+    </div>
+  </div>
+  {{ end }}
 </article>
