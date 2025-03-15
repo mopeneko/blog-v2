@@ -4,7 +4,7 @@
 
 <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
   {{ range .articles }}
-  <div class="card bg-base-100 shadow-sm mt-4">
+  <article class="card bg-base-100 shadow-sm mt-4">
     <figure class="aspect-video">
       {{ if .Thumbnail }}
         <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
@@ -14,9 +14,9 @@
     </figure>
 
     <div class="card-body">
-      <div class="card-title">{{ .Title }}</div>
+      <h2 class="card-title">{{ .Title }}</h2>
 
-      <div class="card-actions justify-end">
+      <footer class="card-actions justify-end">
         <div class="grid grid-row-1 gap-y-2">
           <div class="text-xs text-right">
             <div>Published on {{ date .Sys.Raw.FirstPublishedAt }}</div>
@@ -29,8 +29,8 @@
             {{ end }}
           </div>
         </div>
-      </div>
+      </footer>
     </div>
-  </div>
+  </article>
   {{ end }}
 </div>
