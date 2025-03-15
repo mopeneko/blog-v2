@@ -1,0 +1,4 @@
+.env
+node_modules/
+./app/view/dist/style.css
+tmp/
