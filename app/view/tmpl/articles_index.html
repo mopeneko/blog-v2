@@ -4,33 +4,35 @@
 
 <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
   {{ range .articles }}
-  <article class="card bg-base-100 shadow-sm mt-4">
-    <figure class="aspect-video">
-      {{ if .Thumbnail }}
-        <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
-      {{ else }}
-        <div class="skeleton h-full w-full"></div>
-      {{ end }}
-    </figure>
+  <a href="/posts/{{ .Slug }}">
+    <article class="card bg-base-100 shadow-sm mt-4">
+      <figure class="aspect-video">
+        {{ if .Thumbnail }}
+          <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
+        {{ else }}
+          <div class="skeleton h-full w-full"></div>
+        {{ end }}
+      </figure>
 
-    <div class="card-body">
-      <h2 class="card-title">{{ .Title }}</h2>
+      <div class="card-body">
+        <h2 class="card-title">{{ .Title }}</h2>
 
-      <footer class="card-actions justify-end">
-        <div class="grid grid-row-1 gap-y-2">
-          <div class="text-xs text-right">
-            <div>Published on {{ date .Sys.Raw.FirstPublishedAt }}</div>
-            <div>Updated on {{ date .Sys.Raw.PublishedAt }}</div>
+        <footer class="card-actions justify-end">
+          <div class="grid grid-row-1 gap-y-2">
+            <div class="text-xs text-right">
+              <div>Published on {{ date .Sys.Raw.FirstPublishedAt }}</div>
+              <div>Updated on {{ date .Sys.Raw.PublishedAt }}</div>
+            </div>
+
+            <div class="text-right">
+              {{ range .Tags }}
+              <div class="badge badge-soft badge-primary">{{ .Name }}</div>
+              {{ end }}
+            </div>
           </div>
-
-          <div class="text-right">
-            {{ range .Tags }}
-            <div class="badge badge-soft badge-primary">{{ .Name }}</div>
-            {{ end }}
-          </div>
-        </div>
-      </footer>
-    </div>
-  </article>
+        </footer>
+      </div>
+    </article>
+  </a>
   {{ end }}
 </div>
