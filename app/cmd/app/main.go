@@ -66,15 +66,10 @@ func main() {
 		return view.NewArticle(article, cssHash).Render(c)
 	})
 
-	host := "localhost"
-	if os.Getenv("HOST") != "" {
-		host = os.Getenv("HOST")
-	}
-
 	port := "3000"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
 	}
 
-	log.Fatal(app.Listen(host + ":" + port))
+	log.Fatal(app.Listen(":" + port))
 }
