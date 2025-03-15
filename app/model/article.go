@@ -73,6 +73,7 @@ func FetchArticle(slug string) (*Article, error) {
 
 	q := url.Values{}
 	q.Set("slug", slug)
+	q.Set("depth", "2")
 
 	req, err := http.NewRequest("GET", base_url+path+"?"+q.Encode(), nil)
 	if err != nil {
