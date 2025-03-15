@@ -1,15 +1,19 @@
 package main
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gofiber/template/html/v2"
 	"github.com/mopeneko/blog-v2/app/model"
 	"github.com/mopeneko/blog-v2/app/view"
+	"github.com/mopeneko/blog-v2/app/view/dist"
 	"github.com/mopeneko/blog-v2/app/view/tmpl"
 )
 
@@ -26,6 +30,17 @@ func main() {
 		Views: engine,
 	})
 
+	css, err := dist.Content.ReadFile("style.css")
+	if err != nil {
+		log.Errorw("Failed to read CSS file", "err", err)
+		return
+	}
+
+	cssHashBytes := sha256.Sum256(css)
+	cssHash := fmt.Sprintf("%x", cssHashBytes)
+
+	app.Get("/dist/*", static.New("", static.Config{FS: dist.Content}))
+
 	app.Get("/", func(c fiber.Ctx) error {
 		articles, err := model.FetchArticles()
 		if err != nil {
@@ -33,7 +48,7 @@ func main() {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
-		return view.NewArticlesIndex(articles).Render(c)
+		return view.NewArticlesIndex(articles, cssHash).Render(c)
 	})
 
 	host := "localhost"

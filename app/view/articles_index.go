@@ -7,16 +7,19 @@ import (
 
 type ArticlesIndexView struct {
 	articles []*model.Article
+	cssHash  string
 }
 
-func NewArticlesIndex(articles []*model.Article) *ArticlesIndexView {
+func NewArticlesIndex(articles []*model.Article, cssHash string) *ArticlesIndexView {
 	return &ArticlesIndexView{
 		articles: articles,
+		cssHash:  cssHash,
 	}
 }
 
 func (v *ArticlesIndexView) Render(c fiber.Ctx) error {
 	return c.Render("articles_index", fiber.Map{
 		"articles": v.articles,
-	})
+		"cssHash":  v.cssHash,
+	}, "layout")
 }
