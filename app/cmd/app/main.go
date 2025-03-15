@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"time"
@@ -24,6 +25,10 @@ func main() {
 
 	engine.AddFunc("date", func(t time.Time) string {
 		return t.In(loc).Format("2006-01-02")
+	})
+
+	engine.AddFunc("unescape", func(s string) template.HTML {
+		return template.HTML(s)
 	})
 
 	app := fiber.New(fiber.Config{
@@ -49,6 +54,16 @@ func main() {
 		}
 
 		return view.NewArticlesIndex(articles, cssHash).Render(c)
+	})
+
+	app.Get("/posts/:slug", func(c fiber.Ctx) error {
+		article, err := model.FetchArticle(c.Params("slug"))
+		if err != nil {
+			log.Errorw("Failed to fetch article", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		return view.NewArticle(article, cssHash).Render(c)
 	})
 
 	host := "localhost"
