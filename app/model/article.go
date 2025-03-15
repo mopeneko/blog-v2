@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/mopeneko/blog-v2/app/newt"
 )
@@ -13,11 +14,13 @@ import (
 type Article struct {
 	newt.BaseContent
 
-	Title     string      `json:"title"`
-	Slug      string      `json:"slug"`
-	Thumbnail *newt.Image `json:"thumbnail"`
-	Content   string      `json:"content"`
-	Tags      []Tag       `json:"tags"`
+	Title       string      `json:"title"`
+	Slug        string      `json:"slug"`
+	Thumbnail   *newt.Image `json:"thumbnail"`
+	Content     string      `json:"content"`
+	Tags        []Tag       `json:"tags"`
+	PublishedAt time.Time   `json:"published_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
 }
 
 func FetchArticles() ([]*Article, error) {
@@ -29,7 +32,10 @@ func FetchArticles() ([]*Article, error) {
 
 	path := fmt.Sprintf("/%s/%s", os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
 
-	req, err := http.NewRequest("GET", base_url+path, nil)
+	q := url.Values{}
+	q.Set("order", "-published_at")
+
+	req, err := http.NewRequest("GET", base_url+path+"?"+q.Encode(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
