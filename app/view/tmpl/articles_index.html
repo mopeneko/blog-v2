@@ -8,13 +8,11 @@
   {{ range .articles }}
   <a href="/posts/{{ .Slug }}">
     <article class="card bg-base-100 shadow-sm mt-4">
+      {{ if .Thumbnail }}
       <figure class="aspect-video">
-        {{ if .Thumbnail }}
-          <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
-        {{ else }}
-          <div class="skeleton h-full w-full"></div>
-        {{ end }}
+        <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
       </figure>
+      {{ end }}
 
       <div class="card-body">
         <h2 class="card-title">{{ .Title }}</h2>
