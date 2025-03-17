@@ -66,6 +66,10 @@ func main() {
 		return view.NewArticle(article, cssHash).Render(c)
 	})
 
+	app.Get("/health", func(c fiber.Ctx) error {
+		return c.SendStatus(http.StatusOK)
+	})
+
 	port := "3000"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
