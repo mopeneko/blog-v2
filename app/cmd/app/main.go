@@ -44,6 +44,11 @@ func main() {
 	cssHashBytes := sha256.Sum256(css)
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
 
+	app.Use(func(c fiber.Ctx) error {
+		c.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		return c.Next()
+	})
+
 	app.Get("/dist/*", static.New("", static.Config{FS: dist.Content}))
 
 	app.Get("/", func(c fiber.Ctx) error {
