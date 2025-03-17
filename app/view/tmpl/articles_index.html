@@ -7,7 +7,7 @@
 <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
   {{ range .articles }}
   <a href="/posts/{{ .Slug }}">
-    <article class="card bg-base-100 shadow-sm mt-4">
+    <article class="card bg-base-300 shadow-sm mt-4">
       {{ if .Thumbnail }}
       <figure class="aspect-video">
         <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
