@@ -52,4 +52,20 @@
     </div>
   </div>
   {{ end }}
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Article",
+      "headline": "{{ .article.Title }}",
+      "image": "{{ .article.Thumbnail.Src }}",
+      "datePublished": "{{ .article.PublishedAt }}",
+      "dateModified": "{{ .article.UpdatedAt }}",
+      "author": {
+        "@type": "Person",
+        "name": "もぺ",
+        "url": "https://lem0n.cc/"
+      }
+    }
+  </script>
 </article>
