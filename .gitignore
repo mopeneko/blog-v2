@@ -29,3 +29,5 @@ tmp/
 
 /app/view/dist/style.css
 node_modules/
+
+.vscode/settings.json
