@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gofiber/template/html/v2"
 	"github.com/mopeneko/blog-v2/app/model"
@@ -43,6 +44,8 @@ func main() {
 
 	cssHashBytes := sha256.Sum256(css)
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
+
+	app.Use(logger.New())
 
 	app.Use(func(c fiber.Ctx) error {
 		c.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
