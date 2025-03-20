@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"html/template"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
+
+	gohtml "golang.org/x/net/html"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
@@ -112,6 +116,60 @@ func main() {
 			q.Add("format", "auto")
 			u.RawQuery = q.Encode()
 			article.Thumbnail.Src = u.String()
+		}
+
+		parsed, err := gohtml.Parse(strings.NewReader(article.Content))
+		if err != nil {
+			log.Errorw("Failed to parse HTML", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		var traverse func(n *gohtml.Node)
+		traverse = func(n *gohtml.Node) {
+			if n.Type == gohtml.ElementNode && n.Data == "img" {
+				for i := range n.Attr {
+					if n.Attr[i].Key == "src" {
+						u, err := url.Parse(n.Attr[i].Val)
+						if err != nil {
+							log.Errorw("Failed to parse image URL", "err", err)
+							continue
+						}
+
+						q := u.Query()
+						q.Add("format", "auto")
+						u.RawQuery = q.Encode()
+						n.Attr[i].Val = u.String()
+					}
+				}
+			}
+
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				traverse(c)
+			}
+		}
+
+		traverse(parsed)
+
+		var buf bytes.Buffer
+		gohtml.Render(&buf, parsed)
+		article.Content = buf.String()
+
+		if article.Product.Image != nil {
+			thumbSrc := article.Product.Image.Src
+			if thumbSrc == "" {
+				return view.NewArticle(article, cssHash).Render(c)
+			}
+
+			u, err := url.Parse(thumbSrc)
+			if err != nil {
+				log.Errorw("Failed to parse thumbnail URL", "err", err)
+				return c.SendStatus(http.StatusInternalServerError)
+			}
+
+			q := u.Query()
+			q.Add("format", "auto")
+			u.RawQuery = q.Encode()
+			article.Product.Image.Src = u.String()
 		}
 
 		return view.NewArticle(article, cssHash).Render(c)
