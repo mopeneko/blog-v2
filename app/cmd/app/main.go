@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -63,6 +64,28 @@ func main() {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
+		for i := range articles {
+			if articles[i].Thumbnail == nil {
+				continue
+			}
+
+			thumbSrc := articles[i].Thumbnail.Src
+			if thumbSrc == "" {
+				continue
+			}
+
+			u, err := url.Parse(thumbSrc)
+			if err != nil {
+				log.Errorw("Failed to parse thumbnail URL", "err", err)
+				continue
+			}
+
+			q := u.Query()
+			q.Add("format", "auto")
+			u.RawQuery = q.Encode()
+			articles[i].Thumbnail.Src = u.String()
+		}
+
 		return view.NewArticlesIndex(articles, cssHash).Render(c)
 	})
 
@@ -71,6 +94,24 @@ func main() {
 		if err != nil {
 			log.Errorw("Failed to fetch article", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		if article.Thumbnail != nil {
+			thumbSrc := article.Thumbnail.Src
+			if thumbSrc == "" {
+				return view.NewArticle(article, cssHash).Render(c)
+			}
+
+			u, err := url.Parse(thumbSrc)
+			if err != nil {
+				log.Errorw("Failed to parse thumbnail URL", "err", err)
+				return c.SendStatus(http.StatusInternalServerError)
+			}
+
+			q := u.Query()
+			q.Add("format", "auto")
+			u.RawQuery = q.Encode()
+			article.Thumbnail.Src = u.String()
 		}
 
 		return view.NewArticle(article, cssHash).Render(c)
