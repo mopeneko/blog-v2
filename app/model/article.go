@@ -98,5 +98,9 @@ func FetchArticle(slug string) (*Article, error) {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
+	if len(article.Items) == 0 {
+		return nil, fmt.Errorf("article not found")
+	}
+
 	return article.Items[0], nil
 }

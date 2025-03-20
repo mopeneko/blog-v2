@@ -100,13 +100,8 @@ func main() {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
-		if article.Thumbnail != nil {
-			thumbSrc := article.Thumbnail.Src
-			if thumbSrc == "" {
-				return view.NewArticle(article, cssHash).Render(c)
-			}
-
-			u, err := url.Parse(thumbSrc)
+		if article.Thumbnail != nil && article.Thumbnail.Src != "" {
+			u, err := url.Parse(article.Thumbnail.Src)
 			if err != nil {
 				log.Errorw("Failed to parse thumbnail URL", "err", err)
 				return c.SendStatus(http.StatusInternalServerError)
@@ -154,13 +149,8 @@ func main() {
 		gohtml.Render(&buf, parsed)
 		article.Content = buf.String()
 
-		if article.Product.Image != nil {
-			thumbSrc := article.Product.Image.Src
-			if thumbSrc == "" {
-				return view.NewArticle(article, cssHash).Render(c)
-			}
-
-			u, err := url.Parse(thumbSrc)
+		if article.Product != nil && article.Product.Image != nil && article.Product.Image.Src != "" {
+			u, err := url.Parse(article.Product.Image.Src)
 			if err != nil {
 				log.Errorw("Failed to parse thumbnail URL", "err", err)
 				return c.SendStatus(http.StatusInternalServerError)
