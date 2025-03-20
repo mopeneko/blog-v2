@@ -45,7 +45,9 @@ func main() {
 	cssHashBytes := sha256.Sum256(css)
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
 
-	app.Use(logger.New())
+	app.Use(logger.New(logger.Config{
+		Format: "${time} | ${status} | ${latency} | ${reqHeader:do-connecting-ip} | ${method} | ${path} | ${error}\n",
+	}))
 
 	app.Use(func(c fiber.Ctx) error {
 		c.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
