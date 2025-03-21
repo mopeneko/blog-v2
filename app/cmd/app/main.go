@@ -51,6 +51,8 @@ func main() {
 	cssHashBytes := sha256.Sum256(css)
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
 
+	client := model.NewArticleClient()
+
 	app.Use(logger.New())
 
 	app.Use(func(c fiber.Ctx) error {
@@ -61,7 +63,7 @@ func main() {
 	app.Get("/dist/*", static.New("", static.Config{FS: dist.Content}))
 
 	app.Get("/", func(c fiber.Ctx) error {
-		articles, err := model.FetchArticles()
+		articles, err := client.FetchArticles()
 		if err != nil {
 			log.Errorw("Failed to fetch articles", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
@@ -93,7 +95,7 @@ func main() {
 	})
 
 	app.Get("/posts/:slug", func(c fiber.Ctx) error {
-		article, err := model.FetchArticle(c.Params("slug"))
+		article, err := client.FetchArticle(c.Params("slug"))
 		if err != nil {
 			log.Errorw("Failed to fetch article", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)

@@ -1,13 +1,13 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
 
+	"github.com/gofiber/fiber/v3/client"
 	"github.com/mopeneko/blog-v2/app/newt"
 )
 
@@ -24,77 +24,81 @@ type Article struct {
 	Product     *Product    `json:"product"`
 }
 
-func FetchArticles() ([]*Article, error) {
-	// https://www.newt.so/docs/cdn-api-newt-api
-	base_url := fmt.Sprintf("https://%s.cdn.newt.so/v1", os.Getenv("NEWT_SPACE_UID"))
+type ArticleClient struct {
+	cc *client.Client
+}
+
+func NewArticleClient() *ArticleClient {
+	cc := client.New()
+
+	baseURL := fmt.Sprintf("https://%s.cdn.newt.so/v1/", os.Getenv("NEWT_SPACE_UID"))
 	if os.Getenv("ENV") == "development" {
-		base_url = fmt.Sprintf("https://%s.api.newt.so/v1", os.Getenv("NEWT_SPACE_UID"))
+		baseURL = fmt.Sprintf("https://%s.api.newt.so/v1/", os.Getenv("NEWT_SPACE_UID"))
 	}
 
-	path := fmt.Sprintf("/%s/%s", os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
+	cc.SetBaseURL(baseURL)
+	cc.SetHeader("Authorization", "Bearer "+os.Getenv("NEWT_TOKEN"))
 
-	q := url.Values{}
-	q.Set("order", "-published_at")
-	q.Set("select", "title,slug,thumbnail,tags,published_at,updated_at")
+	return &ArticleClient{
+		cc: cc,
+	}
+}
 
-	req, err := http.NewRequest("GET", base_url+path+"?"+q.Encode(), nil)
+func (c *ArticleClient) FetchArticles() ([]*Article, error) {
+	// https://www.newt.so/docs/cdn-api-newt-api
+	u, err := url.JoinPath(os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to join URL: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("NEWT_TOKEN"))
-
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.cc.Get(u, client.Config{
+		Param: map[string]string{
+			"order":  "-published_at",
+			"select": "title,slug,thumbnail,tags,published_at,updated_at",
+		},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 
-	defer resp.Body.Close()
+	defer resp.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get articles; status=%d", resp.StatusCode)
+	if resp.StatusCode() != http.StatusOK {
+		return nil, fmt.Errorf("failed to get articles; status=%d", resp.StatusCode())
 	}
 
 	contents := new(newt.Contents[*Article])
-	if err := json.NewDecoder(resp.Body).Decode(contents); err != nil {
+	if err := resp.JSON(contents); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return contents.Items, nil
 }
-func FetchArticle(slug string) (*Article, error) {
+func (c *ArticleClient) FetchArticle(slug string) (*Article, error) {
 	// https://www.newt.so/docs/cdn-api-newt-api
-	base_url := fmt.Sprintf("https://%s.cdn.newt.so/v1", os.Getenv("NEWT_SPACE_UID"))
-	if os.Getenv("ENV") == "development" {
-		base_url = fmt.Sprintf("https://%s.api.newt.so/v1", os.Getenv("NEWT_SPACE_UID"))
-	}
-
-	path := fmt.Sprintf("/%s/%s", os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
-
-	q := url.Values{}
-	q.Set("slug", slug)
-	q.Set("depth", "2")
-
-	req, err := http.NewRequest("GET", base_url+path+"?"+q.Encode(), nil)
+	u, err := url.JoinPath(os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to join URL: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("NEWT_TOKEN"))
-
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.cc.Get(u, client.Config{
+		Param: map[string]string{
+			"slug":  slug,
+			"depth": "2",
+		},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 
-	defer resp.Body.Close()
+	defer resp.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get articles; status=%d", resp.StatusCode)
+	if resp.StatusCode() != http.StatusOK {
+		return nil, fmt.Errorf("failed to get articles; status=%d", resp.StatusCode())
 	}
 
 	article := new(newt.Contents[*Article])
-	if err := json.NewDecoder(resp.Body).Decode(article); err != nil {
+	if err := resp.JSON(article); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
