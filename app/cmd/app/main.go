@@ -51,7 +51,7 @@ func main() {
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
 
 	app.Use(logger.New(logger.Config{
-		Format: "${time} | ${status} | ${latency} | ${reqHeader:do-connecting-ip} | ${method} | ${path} | ${error}\n",
+		Format: "${time} | ${status} | ${latency} | ${reqHeader:cf-connecting-ip} | ${method} | ${path} | ${error}\n",
 	}))
 
 	app.Use(func(c fiber.Ctx) error {
