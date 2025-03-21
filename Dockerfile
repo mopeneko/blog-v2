@@ -15,13 +15,15 @@ FROM golang:1.24 AS go-build
 WORKDIR /app
 
 COPY go.* .
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
 
 COPY . .
 
 COPY --from=node-build /app/app/view/dist/style.css ./app/view/dist/style.css
 
-RUN CGO_ENABLED=0 go build -o main ./app/cmd/app
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 go build -o main ./app/cmd/app
 
 FROM gcr.io/distroless/static-debian12
 
