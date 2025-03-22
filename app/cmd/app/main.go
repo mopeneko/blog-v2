@@ -95,6 +95,10 @@ func main() {
 	})
 
 	app.Get("/posts/:slug", func(c fiber.Ctx) error {
+		if strings.HasSuffix(c.OriginalURL(), "/") {
+			return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
+		}
+
 		article, err := client.FetchArticle(c.Params("slug"))
 		if err != nil {
 			log.Errorw("Failed to fetch article", "err", err)
