@@ -95,10 +95,6 @@ func main() {
 		return view.NewArticlesIndex(articles, cssHash).Render(c)
 	})
 
-	app.Get("/posts/:slug/", func(c fiber.Ctx) error {
-		return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
-	})
-
 	app.Get("/posts/:slug", func(c fiber.Ctx) error {
 		article, err := client.FetchArticle(c.Params("slug"))
 		if err != nil {
@@ -169,6 +165,10 @@ func main() {
 		}
 
 		return view.NewArticle(article, cssHash).Render(c)
+	})
+
+	app.Get("/posts/:slug/", func(c fiber.Ctx) error {
+		return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
 	})
 
 	app.Get("/health", func(c fiber.Ctx) error {
