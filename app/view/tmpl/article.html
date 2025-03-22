@@ -58,7 +58,9 @@
       "@context": "http://schema.org",
       "@type": "Article",
       "headline": "{{ .article.Title }}",
+      {{ if .article.Thumbnail }}
       "image": "{{ .article.Thumbnail.Src }}",
+      {{ end }}
       "datePublished": "{{ .article.PublishedAt }}",
       "dateModified": "{{ .article.UpdatedAt }}",
       "author": {
