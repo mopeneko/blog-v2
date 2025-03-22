@@ -38,8 +38,9 @@ func main() {
 	})
 
 	app := fiber.New(fiber.Config{
-		Views:       engine,
-		ProxyHeader: "cf-connecting-ip",
+		Views:         engine,
+		ProxyHeader:   "cf-connecting-ip",
+		StrictRouting: true,
 	})
 
 	css, err := dist.Content.ReadFile("style.css")
@@ -94,11 +95,11 @@ func main() {
 		return view.NewArticlesIndex(articles, cssHash).Render(c)
 	})
 
-	app.Get("/posts/:slug", func(c fiber.Ctx) error {
-		if strings.HasSuffix(c.OriginalURL(), "/") {
-			return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
-		}
+	app.Get("/posts/:slug/", func(c fiber.Ctx) error {
+		return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
+	})
 
+	app.Get("/posts/:slug", func(c fiber.Ctx) error {
 		article, err := client.FetchArticle(c.Params("slug"))
 		if err != nil {
 			log.Errorw("Failed to fetch article", "err", err)
