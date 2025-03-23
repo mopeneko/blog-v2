@@ -18,8 +18,15 @@ func NewArticle(article *model.Article, cssHash string) *ArticleView {
 }
 
 func (v *ArticleView) Render(c fiber.Ctx) error {
-	return c.Render("article", fiber.Map{
+	bind := fiber.Map{
 		"article": v.article,
 		"cssHash": v.cssHash,
-	}, "layout")
+		"title":   v.article.Title,
+	}
+
+	if v.article != nil && v.article.Thumbnail != nil {
+		bind["image"] = v.article.Thumbnail.Src
+	}
+
+	return c.Render("article", bind, "layout")
 }
