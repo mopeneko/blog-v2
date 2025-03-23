@@ -21,5 +21,6 @@ func (v *ArticlesIndexView) Render(c fiber.Ctx) error {
 	return c.Render("articles_index", fiber.Map{
 		"articles": v.articles,
 		"cssHash":  v.cssHash,
+		"url":      "https://www.mope-blog.com",
 	}, "layout")
 }

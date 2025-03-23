@@ -21,6 +21,7 @@ func (v *ArticleView) Render(c fiber.Ctx) error {
 	bind := fiber.Map{
 		"article": v.article,
 		"cssHash": v.cssHash,
+		"url":     "https://www.mope-blog.com/" + v.article.Slug,
 		"title":   v.article.Title,
 	}
 
