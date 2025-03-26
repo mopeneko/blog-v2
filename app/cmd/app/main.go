@@ -54,6 +54,7 @@ func main() {
 	cssHash := fmt.Sprintf("%x", cssHashBytes)
 
 	client := model.NewArticleClient()
+	pageClient := model.NewPageClient()
 
 	app.Use(logger.New())
 
@@ -172,6 +173,82 @@ func main() {
 
 	app.Get("/posts/:slug/", func(c fiber.Ctx) error {
 		return c.Redirect().Status(http.StatusMovedPermanently).To("/posts/" + c.Params("slug"))
+	})
+
+	app.Get("/pages/:slug", func(c fiber.Ctx) error {
+		page, err := pageClient.FetchPage(c.Params("slug"))
+		if err != nil {
+			log.Errorw("Failed to fetch page", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		if page.Thumbnail != nil && page.Thumbnail.Src != "" {
+			u, err := url.Parse(page.Thumbnail.Src)
+			if err != nil {
+				log.Errorw("Failed to parse thumbnail URL", "err", err)
+				return c.SendStatus(http.StatusInternalServerError)
+			}
+
+			q := u.Query()
+			q.Add("format", "auto")
+			u.RawQuery = q.Encode()
+			page.Thumbnail.Src = u.String()
+		}
+
+		parsed, err := gohtml.Parse(strings.NewReader(page.Content))
+		if err != nil {
+			log.Errorw("Failed to parse HTML", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		var traverse func(n *gohtml.Node)
+		traverse = func(n *gohtml.Node) {
+			if n.Type == gohtml.ElementNode && n.Data == "img" {
+				for i := range n.Attr {
+					if n.Attr[i].Key == "src" {
+						u, err := url.Parse(n.Attr[i].Val)
+						if err != nil {
+							log.Errorw("Failed to parse image URL", "err", err)
+							continue
+						}
+
+						q := u.Query()
+						q.Add("format", "auto")
+						u.RawQuery = q.Encode()
+						n.Attr[i].Val = u.String()
+					}
+				}
+			}
+
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				traverse(c)
+			}
+		}
+
+		traverse(parsed)
+
+		var buf bytes.Buffer
+		gohtml.Render(&buf, parsed)
+		page.Content = buf.String()
+
+		if page.Thumbnail != nil && page.Thumbnail.Src != "" {
+			u, err := url.Parse(page.Thumbnail.Src)
+			if err != nil {
+				log.Errorw("Failed to parse thumbnail URL", "err", err)
+				return c.SendStatus(http.StatusInternalServerError)
+			}
+
+			q := u.Query()
+			q.Add("format", "auto")
+			u.RawQuery = q.Encode()
+			page.Thumbnail.Src = u.String()
+		}
+
+		return view.NewPage(page, cssHash).Render(c)
+	})
+
+	app.Get("/pages/:slug/", func(c fiber.Ctx) error {
+		return c.Redirect().Status(http.StatusMovedPermanently).To("/pages/" + c.Params("slug"))
 	})
 
 	app.Get("/health", func(c fiber.Ctx) error {

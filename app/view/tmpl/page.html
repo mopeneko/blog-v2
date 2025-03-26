@@ -1,0 +1,44 @@
+<nav class="navbar shadow-md">
+    <a href="/">
+      <h1 class="btn btn-ghost">もぺブログ</h1>
+    </a>
+  </nav>
+  
+  <article class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto my-8">
+    <h2 class="text-2xl font-bold">{{ .page.Title }}</h2>
+  
+    <div class="grid grid-row-1 gap-y-2 mt-2">
+      <div class="text-xs text-right">
+          <div>Published on {{ date .page.UpdatedAt }}</div>
+          <div>Updated on {{ date .page.PublishedAt }}</div>
+      </div>
+    </div>
+  
+    {{ if .page.Thumbnail }}
+    <figure class="mt-4">
+      <img class="w-full rounded-lg" src="{{ .page.Thumbnail.Src }}" alt="{{ .page.Thumbnail.AltText }}">
+    </figure>
+    {{ end }}
+  
+    <div class="prose mt-8 w-full m-auto">
+      {{ unescape .page.Content }}
+    </div>
+  
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "{{ .page.Title }}",
+        {{ if .page.Thumbnail }}
+        "image": "{{ .page.Thumbnail.Src }}",
+        {{ end }}
+        "datePublished": "{{ .page.PublishedAt }}",
+        "dateModified": "{{ .page.UpdatedAt }}",
+        "author": {
+          "@type": "Person",
+          "name": "もぺ",
+          "url": "https://lem0n.cc/"
+        }
+      }
+    </script>
+  </article>
