@@ -19,6 +19,7 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gofiber/template/html/v2"
 	"github.com/mopeneko/blog-v2/app/model"
+	"github.com/mopeneko/blog-v2/app/public"
 	"github.com/mopeneko/blog-v2/app/view"
 	"github.com/mopeneko/blog-v2/app/view/dist"
 	"github.com/mopeneko/blog-v2/app/view/tmpl"
@@ -62,6 +63,8 @@ func main() {
 	})
 
 	app.Get("/dist/*", static.New("", static.Config{FS: dist.Content}))
+
+	app.Get("/public/*", static.New("", static.Config{FS: public.Content}))
 
 	app.Get("/", func(c fiber.Ctx) error {
 		articles, err := client.FetchArticles()
