@@ -32,7 +32,7 @@
 
   {{ if .article.Product }}
   <div class="prose mt-8 w-full m-auto">
-    <div class="not-prose card bg-base-100 shadow-sm">
+    <div class="not-prose card bg-base-300 shadow-sm">
       {{ if .article.Product.Image }}
       <figure class="aspect-video">
         <img class="h-full" src="{{ .article.Product.Image.Src }}" alt="{{ .article.Product.Image.AltText }}">
@@ -45,13 +45,13 @@
           <span class="text-xs">PR</span>
         </div>
         <p class="card-text text-sm">{{ .article.Product.Manufacture }}</p>
-      </div>
 
-      <footer class="card-actions justify-end">
-        {{ range .article.Product.Links }}
-        <a href="{{ .Data.URL }}" class="btn btn-primary">{{ .Data.Text }}</a>
-        {{ end }}
-      </footer>
+        <footer class="card-actions justify-end">
+          {{ range .article.Product.Links }}
+          <a href="{{ .Data.URL }}" class="btn btn-primary">{{ .Data.Text }}</a>
+          {{ end }}
+        </footer>
+      </div>
     </div>
   </div>
   {{ end }}
