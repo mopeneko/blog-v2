@@ -7,7 +7,7 @@
 <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
   {{ range .articles }}
   <a href="/posts/{{ .Slug }}">
-    <article class="card bg-base-300 shadow-sm mt-4">
+    <article class="card bg-base-200 shadow-sm mt-4">
       {{ if .Thumbnail }}
       <figure class="aspect-video">
         <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
@@ -26,7 +26,7 @@
 
             <div class="text-right">
               {{ range .Tags }}
-              <div class="badge badge-soft badge-primary">{{ .Name }}</div>
+              <div class="badge badge-soft badge-neutral">{{ .Name }}</div>
               {{ end }}
             </div>
           </div>
