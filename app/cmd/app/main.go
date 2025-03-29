@@ -66,6 +66,10 @@ func main() {
 
 	app.Get("/public/*", static.New("", static.Config{FS: public.Content}))
 
+	app.Get("/ads.txt", func(c fiber.Ctx) error {
+		return c.SendString("google.com, pub-3857753364740983, DIRECT, f08c47fec0942fa0")
+	})
+
 	app.Get("/", func(c fiber.Ctx) error {
 		articles, err := client.FetchArticles()
 		if err != nil {
