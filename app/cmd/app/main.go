@@ -97,13 +97,73 @@ func main() {
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
+		h2Count := 0
+
 		var traverse func(n *gohtml.Node)
 		traverse = func(n *gohtml.Node) {
-			if n.Type == gohtml.ElementNode && n.Data == "img" {
-				n.Attr = append(n.Attr, gohtml.Attribute{
-					Key: "loading",
-					Val: "lazy",
-				})
+			if n.Type == gohtml.ElementNode {
+				if n.Data == "img" {
+					n.Attr = append(n.Attr, gohtml.Attribute{
+						Key: "loading",
+						Val: "lazy",
+					})
+				}
+
+				if n.Data == "h2" {
+					h2Count++
+					if h2Count == 2 {
+						adNode := &gohtml.Node{
+							Type: gohtml.ElementNode,
+							Data: "div",
+							Attr: []gohtml.Attribute{
+								{Key: "class", Val: "ad-container"},
+							},
+						}
+
+						// Create script node for AdSense JS
+						scriptNode1 := &gohtml.Node{
+							Type: gohtml.ElementNode,
+							Data: "script",
+							Attr: []gohtml.Attribute{
+								{Key: "async", Val: ""},
+								{Key: "src", Val: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3857753364740983"},
+								{Key: "crossorigin", Val: "anonymous"},
+							},
+						}
+						adNode.AppendChild(scriptNode1)
+
+						// Create ins node for ad placement
+						insNode := &gohtml.Node{
+							Type: gohtml.ElementNode,
+							Data: "ins",
+							Attr: []gohtml.Attribute{
+								{Key: "class", Val: "adsbygoogle"},
+								{Key: "style", Val: "display:block; text-align:center;"},
+								{Key: "data-ad-layout", Val: "in-article"},
+								{Key: "data-ad-format", Val: "fluid"},
+								{Key: "data-ad-client", Val: "ca-pub-3857753364740983"},
+								{Key: "data-ad-slot", Val: "1281498636"},
+							},
+						}
+						adNode.AppendChild(insNode)
+
+						// Create script node for ad initialization
+						scriptNode2 := &gohtml.Node{
+							Type: gohtml.ElementNode,
+							Data: "script",
+						}
+						scriptContent := &gohtml.Node{
+							Type: gohtml.TextNode,
+							Data: "(adsbygoogle = window.adsbygoogle || []).push({});",
+						}
+						scriptNode2.AppendChild(scriptContent)
+						adNode.AppendChild(scriptNode2)
+
+						if n.Parent != nil {
+							n.Parent.InsertBefore(adNode, n)
+						}
+					}
+				}
 			}
 
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
