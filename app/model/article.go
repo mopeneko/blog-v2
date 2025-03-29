@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3/client"
@@ -74,6 +75,44 @@ func (c *ArticleClient) FetchArticles() ([]*Article, error) {
 
 	return contents.Items, nil
 }
+
+func (c *ArticleClient) FetchArticlesByTags(tags []*Tag) ([]*Article, error) {
+	tagIDs := make([]string, len(tags))
+	for i, tag := range tags {
+		tagIDs[i] = tag.ID
+	}
+
+	// https://www.newt.so/docs/cdn-api-newt-api
+	u, err := url.JoinPath(os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to join URL: %w", err)
+	}
+
+	resp, err := c.cc.Get(u, client.Config{
+		Param: map[string]string{
+			"order":    "-published_at",
+			"select":   "title,slug,thumbnail,tags,published_at,updated_at",
+			"tags[in]": strings.Join(tagIDs, ","),
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+
+	defer resp.Close()
+
+	if resp.StatusCode() != http.StatusOK {
+		return nil, fmt.Errorf("failed to get articles; status=%d", resp.StatusCode())
+	}
+
+	contents := new(newt.Contents[*Article])
+	if err := resp.JSON(contents); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return contents.Items, nil
+}
+
 func (c *ArticleClient) FetchArticle(slug string) (*Article, error) {
 	// https://www.newt.so/docs/cdn-api-newt-api
 	u, err := url.JoinPath(os.Getenv("NEWT_APP_UID"), os.Getenv("NEWT_MODEL_UID"))

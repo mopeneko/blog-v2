@@ -113,7 +113,13 @@ func main() {
 		gohtml.Render(&buf, parsed)
 		article.Content = buf.String()
 
-		return view.NewArticle(article, cssHash).Render(c)
+		relatedArticles, err := client.FetchArticlesByTags(article.Tags)
+		if err != nil {
+			log.Errorw("Failed to fetch related articles", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		return view.NewArticle(article, cssHash, relatedArticles).Render(c)
 	})
 
 	app.Get("/posts/:slug/", func(c fiber.Ctx) error {
