@@ -37,6 +37,10 @@ func main() {
 		return template.HTML(s)
 	})
 
+	engine.AddFunc("needToInsertAd", func(i int) bool {
+		return (i+1)%3 == 0
+	})
+
 	app := fiber.New(fiber.Config{
 		Views:         engine,
 		ProxyHeader:   "cf-connecting-ip",

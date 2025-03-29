@@ -5,7 +5,21 @@
 </nav>
 
 <div class="grid grid-row-1 w-9/10 md:w-2/3 xl:w-2/5 mx-auto">
-  {{ range .articles }}
+  {{ range $index, $_ := .articles }}
+  {{ if needToInsertAd $index }}
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3857753364740983"
+     crossorigin="anonymous"></script>
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-format="fluid"
+      data-ad-layout-key="-7c+eo+1+2-5"
+      data-ad-client="ca-pub-3857753364740983"
+      data-ad-slot="5385219852"></ins>
+  <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  {{ end }}
+
   <a href="/posts/{{ .Slug }}">
     <article class="card bg-base-200 shadow-sm mt-4">
       {{ if .Thumbnail }}
