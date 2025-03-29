@@ -18,7 +18,7 @@ type Article struct {
 	Slug        string      `json:"slug"`
 	Thumbnail   *newt.Image `json:"thumbnail"`
 	Content     string      `json:"content"`
-	Tags        []Tag       `json:"tags"`
+	Tags        []*Tag      `json:"tags"`
 	PublishedAt time.Time   `json:"published_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
 	Product     *Product    `json:"product"`
