@@ -22,7 +22,7 @@
 
   {{ if .article.Thumbnail }}
   <figure class="mt-4">
-    <img class="w-full rounded-lg" src="{{ .article.Thumbnail.Src }}" alt="{{ .article.Thumbnail.AltText }}">
+    <img class="w-full rounded-lg" src="{{ .article.Thumbnail.Src }}" alt="{{ .article.Thumbnail.AltText }}" loading="lazy">
   </figure>
   {{ end }}
 

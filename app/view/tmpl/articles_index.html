@@ -10,7 +10,7 @@
     <article class="card bg-base-200 shadow-sm mt-4">
       {{ if .Thumbnail }}
       <figure class="aspect-video">
-        <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}">
+        <img src="{{ .Thumbnail.Src }}" alt="{{ .Thumbnail.AltText }}" loading="lazy">
       </figure>
       {{ end }}
 

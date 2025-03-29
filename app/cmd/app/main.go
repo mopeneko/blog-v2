@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	gohtml "golang.org/x/net/html"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
@@ -78,6 +82,32 @@ func main() {
 			log.Errorw("Failed to fetch article", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
 		}
+
+		parsed, err := gohtml.Parse(strings.NewReader(article.Content))
+		if err != nil {
+			log.Errorw("Failed to parse HTML", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		var traverse func(n *gohtml.Node)
+		traverse = func(n *gohtml.Node) {
+			if n.Type == gohtml.ElementNode && n.Data == "img" {
+				n.Attr = append(n.Attr, gohtml.Attribute{
+					Key: "loading",
+					Val: "lazy",
+				})
+			}
+
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				traverse(c)
+			}
+		}
+
+		traverse(parsed)
+
+		var buf bytes.Buffer
+		gohtml.Render(&buf, parsed)
+		article.Content = buf.String()
 
 		return view.NewArticle(article, cssHash).Render(c)
 	})
