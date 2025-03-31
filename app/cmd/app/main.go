@@ -43,7 +43,7 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		Views:         engine,
-		ProxyHeader:   "cf-connecting-ip",
+		ProxyHeader:   fiber.HeaderXForwardedFor,
 		StrictRouting: true,
 	})
 
