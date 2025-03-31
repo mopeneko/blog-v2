@@ -1,6 +1,7 @@
 package view
 
 import (
+	"os"
 	"slices"
 
 	"github.com/gofiber/fiber/v3"
@@ -11,6 +12,7 @@ type ArticleView struct {
 	article         *model.Article
 	cssHash         string
 	relatedArticles []*model.Article
+	isProd          bool
 }
 
 func NewArticle(article *model.Article, cssHash string, relatedArticles []*model.Article) *ArticleView {
@@ -18,6 +20,7 @@ func NewArticle(article *model.Article, cssHash string, relatedArticles []*model
 		article:         article,
 		cssHash:         cssHash,
 		relatedArticles: relatedArticles,
+		isProd:          os.Getenv("ENV") != "development",
 	}
 }
 
@@ -36,6 +39,7 @@ func (v *ArticleView) Render(c fiber.Ctx) error {
 		"url":             "https://www.mope-blog.com/posts/" + v.article.Slug,
 		"title":           v.article.Title,
 		"relatedArticles": relatedArticles,
+		"isProd":          v.isProd,
 	}
 
 	if v.article != nil && v.article.Thumbnail != nil {
