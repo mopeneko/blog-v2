@@ -41,6 +41,10 @@ func main() {
 		return (i+1)%3 == 0
 	})
 
+	engine.AddFunc("isProd", func() bool {
+		return os.Getenv("ENV") != "development"
+	})
+
 	app := fiber.New(fiber.Config{
 		Views:         engine,
 		ProxyHeader:   "cf-connecting-ip",
