@@ -18,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gofiber/template/html/v2"
 	"github.com/mopeneko/blog-v2/app/model"
+	"github.com/mopeneko/blog-v2/app/newt"
 	"github.com/mopeneko/blog-v2/app/public"
 	"github.com/mopeneko/blog-v2/app/view"
 	"github.com/mopeneko/blog-v2/app/view/dist"
@@ -78,6 +79,20 @@ func main() {
 		articles, err := client.FetchArticles()
 		if err != nil {
 			log.Errorw("Failed to fetch articles", "err", err)
+			return c.SendStatus(http.StatusInternalServerError)
+		}
+
+		return view.NewArticlesIndex(articles, cssHash).Render(c)
+	})
+
+	app.Get("/tags/:id", func(c fiber.Ctx) error {
+		tag := &model.Tag{
+			BaseContent: newt.BaseContent{ID: c.Params("id")},
+			Name:        c.Params("id"), // Temporary name until we fetch actual tag
+		}
+		articles, err := client.FetchArticlesByTags([]*model.Tag{tag})
+		if err != nil {
+			log.Errorw("Failed to fetch articles by tag", "err", err)
 			return c.SendStatus(http.StatusInternalServerError)
 		}
 
