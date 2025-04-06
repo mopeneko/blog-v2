@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    expose:
+      - 3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`www.mope-blog.com`)"
+      - "traefik.http.routers.app.entrypoints=web"
+    networks:
+      - default
+      - traefik_web
+    env_file:
+      - .env.production
+
+networks:
+  traefik_web:
+    external: true
